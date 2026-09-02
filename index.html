@@ -31,7 +31,8 @@ button.success:hover{background:#218838}
 table{width:100%;border-collapse:collapse;background:#fff;border-radius:8px;overflow:hidden}
 th,td{padding:8px 6px;text-align:center;font-size:13px;border:1px solid #e5e5e5}
 th{background:#d5e8f0;font-weight:bold;position:relative}
-th .qmark{display:inline-block;margin-left:3px;cursor:help;color:#7030A0;font-size:12px;vertical-align:middle}
+th .qmark,td .qmark{display:inline-block;margin-left:3px;cursor:help;color:#7030A0;font-size:12px;vertical-align:middle}
+body.mobile th .qmark,body.mobile td .qmark{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:#7030A0;color:#fff;font-size:14px;font-weight:bold;cursor:pointer;margin-left:4px;pointer-events:auto}
 td.name{text-align:left;padding-left:10px;font-weight:500}
 .g{background:#a8e6a3;color:#1a5e1a}
 .y{background:#fff3a0;color:#7a6a10}
@@ -56,10 +57,12 @@ td.star .arr{font-weight:bold;margin-left:2px}
 #qtip{
   position:fixed;z-index:99999;pointer-events:none;opacity:0;
   background:#333;color:#fff;font-size:12px;font-weight:normal;padding:8px 12px;border-radius:6px;
-  max-width:340px;white-space:normal;text-align:left;line-height:1.6;
+  max-width:340px;white-space:pre-line;text-align:left;line-height:1.6;
   box-shadow:0 4px 14px rgba(0,0,0,0.3);transition:opacity .12s;
   font-family:"Microsoft YaHei","PingFang SC",Arial,sans-serif;
 }
+body.mobile #qtip{max-width:88vw;font-size:0.95rem;padding:12px 16px;box-shadow:0 4px 20px rgba(0,0,0,.3)}
+body.mobile #qtip::after{display:none}
 #qtip.show{opacity:1}
 #qtip::after{content:"";position:absolute;top:100%;left:50%;margin-left:-6px;border:6px solid transparent;border-top-color:#333}
 /* 结算弹窗样式 */
@@ -83,12 +86,55 @@ td.star .arr{font-weight:bold;margin-left:2px}
 .settlement-stat .value.lose{color:#e74c3c}
 .settlement-stat .value.normal{color:#333}
 .settlement-record-title{font-size:15px;font-weight:bold;padding:0 20px;margin:8px 0 10px}
-.settlement-chart{display:flex;justify-content:center;gap:6px;padding:0 20px 8px}
-.settlement-col{display:flex;flex-direction:column;gap:3px;align-items:center}
-.settlement-block{width:32px;height:18px;border-radius:3px}
-.settlement-block.g{background:#a8e6a3}
-.settlement-block.y{background:#fff3a0}
-.settlement-block.r{background:#f5a0a0}
+/* ===== 结算页色块矩阵：行=猜测 列=字段 (桌面/手机统一) ===== */
+.settlement-chart{
+  display:flex;flex-direction:column;gap:4px;
+  padding:0 16px 12px;align-items:stretch;
+  overflow-x:auto;-webkit-overflow-scrolling:touch;
+}
+.settlement-chart.mobile{padding:0 10px 12px}
+.settlement-row{display:flex;gap:3px;align-items:stretch;min-height:28px}
+.settlement-chart.mobile .settlement-row{min-height:32px}
+.settlement-cell{display:flex;align-items:center;justify-content:center;font-size:12px;border-radius:3px}
+.settlement-hdr{font-weight:bold}
+.settlement-guess-corner,.settlement-guess-name{
+  width:72px;min-width:72px;max-width:72px;
+  color:#555;font-weight:600;word-break:break-all;font-size:12px;
+  background:#eef1f6;border-right:2px solid #dde2ec;
+}
+.settlement-chart.mobile .settlement-guess-corner,
+.settlement-chart.mobile .settlement-guess-name{width:64px;min-width:64px;max-width:64px;font-size:11px}
+.settlement-fname{
+  flex:1 1 60px;min-width:44px;padding:4px 2px;text-align:center;
+  color:#666;background:#f6f8fc;font-weight:600;line-height:1.25;
+}
+.settlement-block{
+  flex:1 1 60px;min-width:44px;height:100%;min-height:24px;
+  border-radius:3px;
+}
+.settlement-block.g{background:#a8e6a3;box-shadow:inset 0 0 0 1px rgba(50,140,50,.18)}
+.settlement-block.y{background:#fff3a0;box-shadow:inset 0 0 0 1px rgba(140,110,20,.22)}
+.settlement-block.r{background:#f5a0a0;box-shadow:inset 0 0 0 1px rgba(150,40,40,.22)}
+/* 手机端撑满屏幕 */
+body.mobile .settlement-dialog{align-items:flex-start;padding:0}
+body.mobile .settlement-content{
+  width:100%;max-width:100%;height:100%;max-height:100%;
+  border-radius:0;display:flex;flex-direction:column;
+}
+body.mobile .settlement-chart{flex:1;overflow-y:auto;overflow-x:auto}
+body.mobile .settlement-header{padding:10px 16px;flex-shrink:0}
+body.mobile .settlement-title{padding:8px 16px 4px;flex-shrink:0}
+body.mobile .settlement-title h3{font-size:1.2rem}
+body.mobile .settlement-pool{margin-bottom:4px;flex-shrink:0}
+body.mobile .settlement-stats{padding:0 12px 6px;flex-shrink:0;flex-wrap:wrap}
+body.mobile .settlement-stat{min-width:76px;flex:1 1 auto;padding:8px 10px}
+body.mobile .settlement-stat .value{font-size:1rem}
+body.mobile .settlement-record-title{padding:0 14px;font-size:0.95rem;flex-shrink:0}
+body.mobile .settlement-answer{padding:8px 16px;flex-shrink:0}
+body.mobile .settlement-answer .answer-name{font-size:1.4rem}
+body.mobile .settlement-footer{padding:4px 0 6px;flex-shrink:0}
+body.mobile .settlement-btns{padding:8px 14px 12px;flex-shrink:0}
+body.mobile .settlement-btns button{flex:1;min-height:48px;font-size:1.05rem}
 .settlement-answer{text-align:center;padding:12px 20px}
 .settlement-answer .label{color:#888;font-size:13px;margin-bottom:4px}
 .settlement-answer .answer-name{font-size:24px;font-weight:bold;color:#333}
@@ -132,12 +178,6 @@ body.mobile .hint-box{font-size:0.95rem;padding:12px}
 body.mobile .rules-content{max-width:95vw;padding:16px;font-size:0.95rem}
 body.mobile .rules-content h2{font-size:1.2rem}
 body.mobile .rules-content p,.rules-content li{font-size:0.9rem}
-body.mobile .settlement-content{max-width:96vw;width:96%;font-size:0.95rem}
-body.mobile .settlement-header h2{font-size:1.1rem}
-body.mobile .settlement-title h3{font-size:1.2rem}
-body.mobile .settlement-answer .answer-name{font-size:1.35rem}
-body.mobile .settlement-stat .value{font-size:1.1rem}
-body.mobile .settlement-block{width:26px;height:14px}
 /* 转置矩阵默认隐藏，移动端启用 */
 .guess-cards{display:none}
 body.mobile #historyTable{display:none!important}
@@ -418,15 +458,30 @@ function positionQtip(el){
 }
 function hideQtip(){ qtipTarget=null; qtip.classList.remove("show"); }
 
-// 初始化所有 .qmark 的 hover 行为
-document.querySelectorAll(".qmark").forEach(el => {
-  const tipId = el.id; // qmarkTypes / qmarkEggs
+// 初始化所有 .qmark 的 hover/点击行为
+let lastMobileTipTarget = null;
+function tipText(el){
+  const tipId = el.id;
   let text = el.getAttribute("data-tip") || "";
   if (tipId === "qmarkTypes") text = "全部属性：" + VALUE_SETS.types.join("、");
   else if (tipId === "qmarkEggs") text = "全部蛋组：" + VALUE_SETS.eggs.join("、");
-  el.addEventListener("mouseenter", () => showQtip(el, text));
-  el.addEventListener("mouseleave", hideQtip);
-  el.addEventListener("mousemove", () => positionQtip(el));
+  return text;
+}
+document.querySelectorAll(".qmark").forEach(el => {
+  el.addEventListener("mouseenter", () => { if (!window.__isMobile) showQtip(el, tipText(el)); });
+  el.addEventListener("mouseleave", () => { if (!window.__isMobile) hideQtip(); });
+  el.addEventListener("mousemove", () => { if (!window.__isMobile) positionQtip(el); });
+  el.addEventListener("click", e => {
+    e.stopPropagation();
+    if (!window.__isMobile) return;
+    if (lastMobileTipTarget === el) { hideQtip(); lastMobileTipTarget = null; return; }
+    showQtip(el, tipText(el));
+    lastMobileTipTarget = el;
+  });
+});
+// 移动端点击其他区域 → 收起 tip
+document.addEventListener("click", () => {
+  if (lastMobileTipTarget) { hideQtip(); lastMobileTipTarget = null; }
 });
 
 function newState(){
@@ -543,21 +598,23 @@ function renderHistory(){
     const FIELDS=[
       {label:'名称',  k:'name'},
       {label:'阶级',  k:'tier'},
-      {label:'星光值',k:'star'},
-      {label:'属性',  k:'type'},
-      {label:'蛋组',  k:'egg'},
+      {label:'星光值',k:'star',  tip:'▲：你的答案数字比答案高\n▼：你的答案数字比答案低'},
+      {label:'属性',  k:'type',  tip:'🟢 完全相同（顺序无关）；🟡 有相同属性但不同；🔴 完全不同。\n全部属性：'+VALUE_SETS.types.join('、')},
+      {label:'蛋组',  k:'egg',   tip:'🟢 完全相同（顺序无关）；🟡 有相同蛋组但不同；🔴 完全不同。\n「无法孵蛋」特殊：双方都只有「无法孵蛋」才绿，否则红。\n全部蛋组：'+VALUE_SETS.eggs.join('、')},
       {label:'异色',  k:'shiny'},
       {label:'首领化',k:'boss'},
-      {label:'多形态',k:'multi'}
+      {label:'多形态',k:'multi', tip:'是否为同一只精灵（图鉴编号不变）的不同变体。如「鸭吉吉（蓬松的样子）」。\n✔ 表示有多形态，✖ 表示没有。'}
     ];
+    const tipOf=f=>f.tip?`<span class="qmark" data-tip="${f.tip.replace(/"/g,'&quot;')}">?</span>`:'';
     let html='<table><thead><tr><th class="FLD">字段</th>';
     state.guesses.forEach((h,i)=>{
       const ok=(h.entry.name===state.answer.name);
-      html+='<th class="'+(ok?'g':'r')+' nameHdr" title="'+h.entry.name+'">'+h.entry.name+'</th>';
+      const nm=h.entry.name.length>5?h.entry.name.slice(0,5)+'…':h.entry.name;
+      html+='<th class="'+(ok?'g':'r')+' nameHdr" title="'+h.entry.name+'">'+nm+'</th>';
     });
     html+='</tr></thead><tbody>';
     FIELDS.forEach(f=>{
-      html+='<tr><td class="FLD">'+f.label+'</td>';
+      html+='<tr><td class="FLD">'+f.label+tipOf(f)+'</td>';
       state.guesses.forEach(h=>{
         const m=h.match, c=h.entry;
         let val, mc;
@@ -657,18 +714,28 @@ function showSettlement(){
   // 设置正确答案
   $("answerName").textContent=answer.name;
   
-  // 生成猜测记录图表
+  // 生成猜测记录图表（桌面/手机统一：行=猜测，列=字段）
   chart.innerHTML="";
+  chart.className="settlement-chart"+(window.__isMobile?" mobile":"");
   const fields=["tier","star","type","egg","shiny","boss","multi"];
-  state.guesses.forEach(h=>{
-    const col=document.createElement("div");
-    col.className="settlement-col";
+  const FIELD_NAMES={tier:"阶级",star:"星光值",type:"属性",egg:"蛋组",shiny:"异色",boss:"首领化",multi:"多形态"};
+  /* 表头：字段名 */
+  const hdr=document.createElement("div");hdr.className="settlement-row settlement-hdr";
+  hdr.innerHTML='<div class="settlement-cell settlement-guess-corner">猜测 \ 字段</div>';
+  fields.forEach(f=>{hdr.innerHTML+='<div class="settlement-cell settlement-fname">'+FIELD_NAMES[f]+'</div>'});
+  chart.appendChild(hdr);
+  /* 每次猜测一行 */
+  state.guesses.forEach((h,idx)=>{
+    const row=document.createElement("div");row.className="settlement-row";
+    const lb=document.createElement("div");lb.className="settlement-cell settlement-guess-name";
+    lb.textContent=h.entry.name.length>4?h.entry.name.slice(0,4)+"…":h.entry.name;
+    row.appendChild(lb);
     fields.forEach(f=>{
       const block=document.createElement("div");
-      block.className="settlement-block "+cls(h.match[f]);
-      col.appendChild(block);
+      block.className="settlement-cell settlement-block "+cls(h.match[f]);
+      row.appendChild(block);
     });
-    chart.appendChild(col);
+    chart.appendChild(row);
   });
   
   dialog.classList.add("show");
