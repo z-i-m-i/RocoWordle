@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 <title>猜精灵 Wordle</title>
 <style>
 *{box-sizing:border-box}
@@ -98,9 +99,132 @@ td.star .arr{font-weight:bold;margin-left:2px}
 .settlement-btns .btn-play:hover{background:linear-gradient(135deg,#5a2680,#7d3c98)}
 .settlement-btns .btn-close{background:#e0e0e0;color:#333}
 .settlement-btns .btn-close:hover{background:#d0d0d0}
+
+/* ================================
+   手机版自适应样式
+   通过 JS 在 <body> 上加 .mobile 类来启用
+   ================================ */
+body.mobile{font-size:16px}
+body.mobile .wrap{padding:10px;max-width:100%}
+body.mobile header{flex-direction:column;align-items:stretch;gap:8px;padding:12px 14px}
+body.mobile header h1{font-size:1.35rem;margin:0;text-align:center}
+body.mobile .stats{font-size:0.95rem;text-align:center}
+body.mobile .stats span{margin:0 6px}
+body.mobile .toolbar{flex-direction:column;gap:8px}
+body.mobile .toolbar .left{flex-wrap:wrap;gap:8px}
+body.mobile .toolbar button{flex:1 1 auto;min-height:46px;font-size:1rem;padding:10px 8px;border-radius:8px}
+body.mobile #newGameBtn{width:100%;min-height:46px;font-size:1rem}
+body.mobile button{min-height:44px;font-size:1rem;border-radius:8px}
+body.mobile .search-row{display:flex;flex-direction:column;gap:8px;align-items:stretch}
+body.mobile .search-row input{min-height:48px;width:100%;font-size:1.05rem;padding:12px 14px;border-radius:10px;box-sizing:border-box}
+body.mobile .search-row input::placeholder{font-size:0.9rem}
+body.mobile #guessBtn{width:100%;min-height:50px;font-size:1.1rem;font-weight:bold;padding:14px}
+body.mobile .result-list{max-height:320px}
+body.mobile .result-list .item{font-size:1rem;min-height:48px;display:flex;align-items:center;line-height:1.4}
+body.mobile .history-title{font-size:1.1rem;margin:10px 0 8px}
+/* 手机版猜测历史改为卡片式横向滚动 */
+body.mobile #historyTable{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;font-size:0.9rem}
+body.mobile #historyTable thead{font-size:0.82rem}
+body.mobile #historyTable th,body.mobile #historyTable td{padding:6px 4px;white-space:nowrap;font-size:0.85rem}
+body.mobile #historyTable td.name{font-size:0.92rem;padding-left:8px}
+body.mobile .msg{font-size:1rem;padding:12px 14px}
+body.mobile .hint-box{font-size:0.95rem;padding:12px}
+body.mobile .rules-content{max-width:95vw;padding:16px;font-size:0.95rem}
+body.mobile .rules-content h2{font-size:1.2rem}
+body.mobile .rules-content p,.rules-content li{font-size:0.9rem}
+body.mobile .settlement-content{max-width:96vw;width:96%;font-size:0.95rem}
+body.mobile .settlement-header h2{font-size:1.1rem}
+body.mobile .settlement-title h3{font-size:1.2rem}
+body.mobile .settlement-answer .answer-name{font-size:1.35rem}
+body.mobile .settlement-stat .value{font-size:1.1rem}
+body.mobile .settlement-block{width:26px;height:14px}
+/* 转置矩阵默认隐藏，移动端启用 */
+.guess-cards{display:none}
+body.mobile #historyTable{display:none!important}
+body.mobile .guess-cards{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;
+  border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.08);background:#fff}
+/* 转置矩阵样式：行=字段，列=猜测 */
+.guess-cards table{border-collapse:collapse;font-size:.95rem}
+.guess-cards th{padding:8px 6px;text-align:center;background:#fafafa;border:1px solid #eee;white-space:nowrap;font-weight:bold}
+.guess-cards td{padding:8px 6px;text-align:center;border:1px solid #eee;white-space:nowrap}
+.guess-cards .FLD{border-left:2px solid #ccc;color:#666;text-align:left;min-width:56px;font-size:.85rem;background:#f9f9f9;font-weight:bold}
+.guess-cards thead th{font-size:.85rem}
+.guess-cards tbody td.g{background:#e6f4ea;color:#1a5e1a}
+.guess-cards tbody td.y{background:#fff8e1;color:#7a6a10}
+.guess-cards tbody td.r{background:#fdeaea;color:#7a1a1a}
+.guess-cards .nameHdr{font-weight:bold;font-size:.9rem;max-width:90px;overflow:hidden;text-overflow:ellipsis}
+.guess-cards .arr{font-weight:bold}
 </style>
 </head>
 <body>
+<script>
+/* 设备检测：触屏手机或窄屏自动启用移动版 + 兼容 hover 媒体查询 */
+(function(){
+  var isMobile = false;
+  // 方法1: 匹配 CSS 媒体查询 (hover:none & pointer:coarse)
+  if (window.matchMedia && window.matchMedia('(hover:none) and (pointer:coarse)').matches) {
+    isMobile = true;
+  }
+  // 方法2: UA 包含移动关键词
+  if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(navigator.userAgent)) {
+    isMobile = true;
+  }
+  // 方法3: 屏幕宽度 <= 768px 且支持触摸
+  if (window.innerWidth <= 768 && ('ontouchstart' in window || navigator.maxTouchPoints > 0)) {
+    isMobile = true;
+  }
+  if (isMobile) {
+    document.documentElement.classList.add('mobile-root');
+    document.body.classList.add('mobile');
+    // 触发 viewport 强制初始 scale，避免浏览器自动缩放导致字体过小
+    var vp = document.querySelector('meta[name="viewport"]');
+    if (vp) {
+      var cw = window.innerWidth;
+      var scale = cw < 375 ? cw / 375 : 1;
+      vp.setAttribute('content', 'width=375, initial-scale=' + scale.toFixed(3) + ', maximum-scale=5.0, user-scalable=yes');
+    }
+  }
+  // 把设备类别挂到 window 上供其他脚本使用
+  window.__isMobile = isMobile;
+})();
+
+/* ---- 桌面端快捷切换 + URL 参数支持 ---- */
+(function(){
+  function setMobile(cls){
+    var vp=document.querySelector('meta[name="viewport"]');
+    if(cls){
+      document.documentElement.classList.add('mobile-root');
+      document.body.classList.add('mobile');
+      if(vp) vp.setAttribute('content','width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes');
+    } else {
+      document.documentElement.classList.remove('mobile-root');
+      document.body.classList.remove('mobile');
+      if(vp) vp.setAttribute('content','width=device-width, initial-scale=1.0, maximum-scale=5.0');
+    }
+  }
+  // URL 参数优先：?mobile=1 / ?mobile=0
+  var params=new URLSearchParams(location.search);
+  if(params.has('mobile')){
+    setMobile(params.get('mobile')==='1'||params.get('mobile')==='true');
+  }
+  // 快捷键 Alt+Shift+M 切换（桌面端调试用，纯键盘不触发 MTD 浮岛）
+  document.addEventListener('keydown',function(e){
+    if(e.altKey&&e.shiftKey&&(e.key==='m'||e.key==='M')){
+      e.preventDefault();
+      var on=document.body.classList.contains('mobile');
+      setMobile(!on);
+      window.__isMobile=!on;
+      var tip=document.createElement('div');
+      tip.textContent='已切换到「'+(!on?'手机':'电脑')+'版」';
+      tip.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:8px 16px;border-radius:6px;font-size:14px;z-index:99999;transition:opacity .3s';
+      document.body.appendChild(tip);
+      setTimeout(function(){tip.style.opacity='0';setTimeout(function(){tip.remove()},300)},1200);
+    }
+  });
+  // 暴露到全局，控制台可手动调用：switchMobile(true/false)
+  window.switchMobile=setMobile;
+})();
+</script>
 <div class="wrap">
   <header>
     <h1>🎮 猜精灵 Wordle</h1>
@@ -138,6 +262,7 @@ td.star .arr{font-weight:bold;margin-left:2px}
     </tr></thead>
     <tbody id="historyBody"></tbody>
   </table>
+  <div id="historyCards" class="guess-cards"></div>
 </div>
 <div class="rules-dialog" id="rulesDialog">
   <div class="rules-content">
@@ -173,9 +298,10 @@ td.star .arr{font-weight:bold;margin-left:2px}
       <li><span style="background:#FDD835; padding:2px 6px;border-radius:3px;">黄</span> 猜测值与答案「相近」但不完全相同</li>
       <li><span style="background:#F56C6C; padding:2px 6px;border-radius:3px;">红</span> 猜测值与答案完全不同</li>
     </ul>
-    <h3>比较字段（共 7 项）</h3>
+    <h3>比较字段（共 8 项）</h3>
     <table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;width:100%;">
       <tr style="background:#eee;"><th>字段</th><th>说明</th></tr>
+      <tr><td>名称</td><td>精灵的名称（完全相同才算胜利）</td></tr>
       <tr><td>阶级</td><td>精灵的形态阶级（1 / 2 / 3 ）</td></tr>
       <tr><td>星光值</td><td>精灵的星光值</td></tr>
       <tr><td>属性</td><td>精灵的属性（注：多形态精灵按默认形态属性计算）</td></tr>
@@ -200,8 +326,9 @@ td.star .arr{font-weight:bold;margin-left:2px}
     </ul>
     <h3>胜利与失败</h3>
     <ul>
-      <li>所有字段反馈均为绿色 → <b style="color:green;">胜利</b></li>
+      <li>8 个字段全部命中（名称 + 7 个属性均为绿色）→ <b style="color:green;">胜利</b></li>
       <li>8 次机会耗尽仍未全部猜中 → <b style="color:red;">失败</b></li>
+      <li>特殊：7 个属性字段全绿但名称不对 → 系统弹出提示并补偿一次机会，不会误判为胜利</li>
     </ul>
     <h3>提示说明</h3>
     <ul>
@@ -377,7 +504,8 @@ guessBtn.onclick=()=>{
   state.guesses.push({entry:c,match:m});
   state.guessesLeft--;
   state.selected=null;searchInput.value="";renderSearch();renderHistory();renderStats();
-  if(isAllGreen(m)){state.over=true;state.won=true;showMsg("🎉 恭喜！答案就是「"+state.answer.name+"」！","win");setTimeout(showSettlement,1500)}
+  if(isAllGreen(m)&&c.name===state.answer.name){state.over=true;state.won=true;showMsg("🎉 恭喜！答案就是「"+state.answer.name+"」！","win");setTimeout(showSettlement,1500)}
+  else if(isAllGreen(m)&&c.name!==state.answer.name){showMsg("⚠️ 7 个属性字段全部命中，但精灵名称不对！请继续猜测正确的精灵名称。","info");state.guessesLeft++ /* 补偿一次机会避免非战之罪 */}
   else if(state.guessesLeft<=0){state.over=true;state.won=false;showMsg("💔 机会用尽！正确答案是「"+state.answer.name+"」","lose");setTimeout(showSettlement,1500)}
 };
 
@@ -394,6 +522,8 @@ function starHtml(c,m){
 }
 function renderHistory(){
   historyBody.innerHTML="";
+  historyCards.innerHTML="";
+  /* 桌面端表格行：一次猜测 = 一行 */
   state.guesses.forEach(h=>{
     const c=h.entry,m=h.match;
     const nameCls=(c.name===state.answer.name)?"g":"r";
@@ -408,6 +538,52 @@ function renderHistory(){
       '<td class="'+cls(m.multi)+'">'+flag(c.multi)+'</td>';
     historyBody.appendChild(tr);
   });
+  /* 移动端：转置矩阵 = 行是字段、列是猜测，方便左右滑动对比 */
+  if(window.__isMobile && state.guesses.length){
+    const FIELDS=[
+      {label:'名称',  k:'name'},
+      {label:'阶级',  k:'tier'},
+      {label:'星光值',k:'star'},
+      {label:'属性',  k:'type'},
+      {label:'蛋组',  k:'egg'},
+      {label:'异色',  k:'shiny'},
+      {label:'首领化',k:'boss'},
+      {label:'多形态',k:'multi'}
+    ];
+    let html='<table><thead><tr><th class="FLD">字段</th>';
+    state.guesses.forEach((h,i)=>{
+      const ok=(h.entry.name===state.answer.name);
+      html+='<th class="'+(ok?'g':'r')+' nameHdr" title="'+h.entry.name+'">'+h.entry.name+'</th>';
+    });
+    html+='</tr></thead><tbody>';
+    FIELDS.forEach(f=>{
+      html+='<tr><td class="FLD">'+f.label+'</td>';
+      state.guesses.forEach(h=>{
+        const m=h.match, c=h.entry;
+        let val, mc;
+        switch(f.k){
+          case 'name':   val=c.name;               mc=(c.name===state.answer.name)?'g':'r'; break;
+          case 'tier':   val=tierTxt(c.tier);      mc=cls(m.tier);   break;
+          case 'star':   val=starTxt(c);           mc=cls(m.star);   break;
+          case 'type':   val=typeTxt(c)||'—';      mc=cls(m.type);   break;
+          case 'egg':    val=eggTxt(c);            mc=cls(m.egg);    break;
+          case 'shiny':  val=flag(c.shiny);        mc=cls(m.shiny);  break;
+          case 'boss':   val=flag(c.boss);         mc=cls(m.boss);   break;
+          case 'multi':  val=flag(c.multi);        mc=cls(m.multi);  break;
+          default: val=''; mc='';
+        }
+        html+='<td class="'+mc+'">'+val+'</td>';
+      });
+      html+='</tr>';
+    });
+    html+='</tbody></table>';
+    historyCards.innerHTML=html;
+  }
+}
+function starTxt(c){
+  const n=c.star?c.star.toString():"—";
+  if(!state.answer.star||!c.star||c.star===state.answer.star)return n;
+  return n+(c.star>state.answer.star?'▲':'▼');
 }
 
 function renderStats(){
@@ -508,7 +684,7 @@ $("btnPlayAgain").onclick=()=>{hideSettlement();startNewGame();};
 $("settlementDialog").onclick=e=>{if(e.target===e.currentTarget)hideSettlement()};
 
 function startNewGame(){
-  state=newState();historyBody.innerHTML="";hintArea.innerHTML="";hintArea.style.display="none";
+  state=newState();historyBody.innerHTML="";historyCards.innerHTML="";hintArea.innerHTML="";hintArea.style.display="none";
   searchInput.value="";resultList.innerHTML='<div class="empty">输入关键词开始搜索</div>';
   clearMsg();renderStats();guessBtn.disabled=true;
 }
